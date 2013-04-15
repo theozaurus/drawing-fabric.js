@@ -22,7 +22,6 @@ DrawingFabric.Functionality.mouseInfo = (function(){
       this.fabricCanvas.on("mouse:move",function(event){
         config.x.html(event.e.layerX);
         config.y.html(event.e.layerY);
-        console.log(event.e);
       });
 
     };
@@ -69,12 +68,26 @@ DrawingFabric.Functionality.drawWithMouse = (function(){
         }
       };
 
+      var setDimensions = function(object,width,height){
+        switch(that.tool()){
+        case 'ellipse':
+          object.set('rx',width * 0.5).
+                 set('ry',height * 0.5).
+                 set('width',width).
+                 set('height',height);
+          break;
+        case 'rectangle':
+          object.set('width',width).
+                 set('height',height);
+          break;
+        }
+      };
+
       var isObject = function(){
         return ['ellipse','rectangle'].indexOf(that.tool()) >= 0;
       };
 
       this.fabricCanvas.on('mouse:down', function(event){
-        console.warn(that.tool());
         if(isObject() && !event.target ){
           mouseStartCoord = utils.mouseCoord(event);
           mouseState      = 'down';
@@ -82,7 +95,6 @@ DrawingFabric.Functionality.drawWithMouse = (function(){
           var object = newObject({
             left:   mouseStartCoord.x,
             top:    mouseStartCoord.y,
-            radius: 0,
             fill:   that.colour(),
             active: true
           });
@@ -107,11 +119,21 @@ DrawingFabric.Functionality.drawWithMouse = (function(){
       });
 
       this.fabricCanvas.on('mouse:move', function(event){
+
         if(isObject() && mouseState == 'down'){
           // Resize object as mouse moves
           var coords = utils.mouseCoord(event);
-          mouseObject.set('width',mouseObject.left - coords.x);
-          mouseObject.set('height',mouseObject.top - coords.y);
+
+          var width  = coords.x - mouseStartCoord.x;
+          var height = coords.y - mouseStartCoord.y;
+
+          var centerX = mouseStartCoord.x + 0.5 * width;
+          var centerY = mouseStartCoord.y + 0.5 * height;
+
+          setDimensions(mouseObject,Math.abs(width),Math.abs(height));
+          mouseObject.set('left',centerX).
+                      set('top',centerY);
+
           that.fabricCanvas.renderAll();
         }
       });
