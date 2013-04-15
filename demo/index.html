@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <title>Drawing Fabric</title>
+    <script type='text/javascript' src='../src/drawing_fabric.js'></script>
+    <script type='text/javascript' src='../vendor/fabric.js'></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+    <script type='text/javascript' src='./demo.js'></script>
+  </head>
+  <body>
+    <h1>Drawing Fabric</h1>
+
+    <div class='tools'>
+      <ul>
+        <li class='js-tools-cursor'>Cursor</li>
+        <li class='js-tools-ellipse'>Ellipse</li>
+        <li class='js-tools-rectangle'>Rectangle</li>
+      </ul>
+    </div>
+
+    <div class='mouse-info'>
+      <ul>
+        <dt>X</dt>
+        <dd class='js-mouse-info-x'></dd>
+        <dt>Y</dt>
+        <dd class='js-mouse-info-y'></dd>
+      </ul>
+    </div>
+
+    <div class='properties'>
+      <dl>
+        <dt>Fill Colour</dt>
+        <dd class='js-selected-properties-fill'></dd>
+      </ul>
+    </div>
+
+    <canvas id='canvas' width='500px' height='500px'></canvas>
+
+  </body>
+</html>
