@@ -6,7 +6,8 @@ $(function(){
   c.addFunctionality(new DrawingFabric.Functionality.tools({
     cursor:    $('.js-tools-cursor'),
     ellipse:   $('.js-tools-ellipse'),
-    rectangle: $('.js-tools-rectangle')
+    rectangle: $('.js-tools-rectangle'),
+    triangle:  $('.js-tools-triangle')
   }));
   c.addFunctionality(new DrawingFabric.Functionality.mouseInfo({
     x:    $('.js-mouse-info-x'),

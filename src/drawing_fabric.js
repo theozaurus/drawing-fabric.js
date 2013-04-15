@@ -114,6 +114,7 @@ DrawingFabric.Functionality.tools = (function(){
       config.cursor.click(    function(){ tool = 'cursor';    });
       config.ellipse.click(   function(){ tool = 'ellipse';   });
       config.rectangle.click( function(){ tool = 'rectangle'; });
+      config.triangle.click(  function(){ tool = 'triangle';  });
 
       this.tool = function(){ return tool; };
     };
@@ -138,6 +139,8 @@ DrawingFabric.Functionality.drawWithMouse = (function(){
           return new fabric.Ellipse(args);
         case 'rectangle':
           return new fabric.Rect(args);
+        case 'triangle':
+          return new fabric.Triangle(args);
         }
       };
 
@@ -149,6 +152,7 @@ DrawingFabric.Functionality.drawWithMouse = (function(){
                  set('width',width).
                  set('height',height);
           break;
+        case 'triangle':
         case 'rectangle':
           object.set('width',width).
                  set('height',height);
@@ -157,7 +161,7 @@ DrawingFabric.Functionality.drawWithMouse = (function(){
       };
 
       var isObject = function(){
-        return ['ellipse','rectangle'].indexOf(that.tool()) >= 0;
+        return ['ellipse','rectangle','triangle'].indexOf(that.tool()) >= 0;
       };
 
       this.fabricCanvas.on('mouse:down', function(event){
@@ -171,6 +175,8 @@ DrawingFabric.Functionality.drawWithMouse = (function(){
             fill:   that.colour(),
             active: true
           });
+
+          object.set('width',0).set('height',0);
 
           that.fabricCanvas.add(object);
           that.fabricCanvas.setActiveObject(object,event);
