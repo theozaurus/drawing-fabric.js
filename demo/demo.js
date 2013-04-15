@@ -1,6 +1,8 @@
 $(function(){
   c = new DrawingFabric.Canvas('canvas');
 
+  c.addFunctionality(new DrawingFabric.Functionality.keyboardCommands());
+
   c.addFunctionality(new DrawingFabric.Functionality.tools({
     cursor:    $('.js-tools-cursor'),
     ellipse:   $('.js-tools-ellipse'),

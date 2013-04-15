@@ -1,4 +1,5 @@
 //= require fabric
+//= require jquery
 
 DrawingFabric = {};
 
@@ -22,6 +23,78 @@ DrawingFabric.Functionality.mouseInfo = (function(){
       this.fabricCanvas.on("mouse:move",function(event){
         config.x.html(event.e.layerX);
         config.y.html(event.e.layerY);
+      });
+
+    };
+
+  };
+
+}());
+
+DrawingFabric.Functionality.keyboardCommands = (function(){
+
+  return function(config){
+
+    this.initialize = function(){
+
+      var lastDownTarget;
+      var that = this;
+      var element = this.fabricCanvas.upperCanvasEl;
+
+      var activeObject = function(){
+        return that.fabricCanvas.getActiveObject();
+      };
+
+      var move = function(x,y){
+        var obj = activeObject();
+        if(obj){
+          obj.set('left',obj.left + x);
+          obj.set('top',obj.top + y);
+          obj.setCoords();
+          that.fabricCanvas.renderAll();
+        }
+      };
+
+      var destroy = function(){
+        var obj = activeObject();
+        if(obj){
+          that.fabricCanvas.remove(obj);
+        }
+      };
+
+      var handle = function(e){
+        var scale = (e.shiftKey && 10) || 1;
+
+        switch(e.which){
+        case 76: // l
+        case 37: // left
+          move(-1 * scale,0);
+          break;
+        case 72: // h
+        case 39: // right
+          move(1 * scale,0);
+          break;
+        case 75: // k
+        case 38: // up
+          move(0,-1 * scale);
+          break;
+        case 74: // j
+        case 40: // down
+          move(0,1 * scale);
+          break;
+
+        case 8:  // backspace
+        case 46: // delete
+          destroy();
+        }
+      };
+
+      $(document).mousedown(function(e){
+        lastDownTarget = e.target;
+      });
+
+      $(document).keydown(function(e){
+        if(lastDownTarget == element){ handle(e); }
       });
 
     };
