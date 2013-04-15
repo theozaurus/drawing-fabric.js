@@ -150,16 +150,26 @@ DrawingFabric.Functionality.selectedProperties = (function(){
     this.initialize = function(){
       var that = this;
 
-      this.fabricCanvas.on('object:selected', function(event){
-        console.warn('object:selected',event, that.fabricCanvas.getActiveObject());
-        // config.
-        config.fill.html(event.target.fill);
-      });
+      var update = function(event){
+        var shape = event.target;
+        config.fill.html(shape.fill);
+        config.top.html(shape.top);
+        config.left.html(shape.left);
+        config.width.html(shape.get('width'));
+        config.height.html(shape.get('height'));
+      };
+
+      this.fabricCanvas.on('object:selected', update);
+      this.fabricCanvas.on('object:modified', update);
+      this.fabricCanvas.on('object:scaling',  update);
+      this.fabricCanvas.on('object:moving',   update);
 
       this.fabricCanvas.on('selection:cleared', function(event){
-        console.warn('selection:cleared',event);
-        // config.
         config.fill.html('');
+        config.top.html('');
+        config.left.html('');
+        config.width.html('');
+        config.height.html('');
       });
 
     };

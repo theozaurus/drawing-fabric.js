@@ -12,7 +12,11 @@ $(function(){
   }));
   c.addFunctionality(new DrawingFabric.Functionality.drawWithMouse());
   c.addFunctionality(new DrawingFabric.Functionality.selectedProperties({
-    fill: $('.js-selected-properties-fill')
+    fill:   $('.js-selected-properties-fill'),
+    top:    $('.js-selected-properties-top'),
+    left:   $('.js-selected-properties-left'),
+    width:  $('.js-selected-properties-width'),
+    height: $('.js-selected-properties-height')
   }));
 
 });
