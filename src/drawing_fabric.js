@@ -127,8 +127,17 @@ DrawingFabric.Functionality.drawWithMouse = (function(){
           var width  = coords.x - mouseStartCoord.x;
           var height = coords.y - mouseStartCoord.y;
 
-          var centerX = mouseStartCoord.x + 0.5 * width;
-          var centerY = mouseStartCoord.y + 0.5 * height;
+
+          var centerX, centerY;
+          if(event.e.altKey){
+            centerX = mouseStartCoord.x;
+            centerY = mouseStartCoord.y;
+            width  *= 2;
+            height *= 2;
+          } else {
+            centerX = mouseStartCoord.x + 0.5 * width;
+            centerY = mouseStartCoord.y + 0.5 * height;
+          }
 
           setDimensions(mouseObject,Math.abs(width),Math.abs(height));
           mouseObject.set('left',centerX).
