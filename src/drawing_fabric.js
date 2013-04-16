@@ -124,13 +124,53 @@ DrawingFabric.Functionality.tools = (function(){
 
     this.initialize = function(){
 
-      config.cursor.click(    function(){ tool = 'cursor';    });
-      config.ellipse.click(   function(){ tool = 'ellipse';   });
-      config.rectangle.click( function(){ tool = 'rectangle'; });
-      config.triangle.click(  function(){ tool = 'triangle';  });
-      config.line.click(      function(){ tool = 'line';      });
+      var that = this;
 
-      this.tool = function(){ return tool; };
+      config.cursor.click(    function(){ that.tool('cursor');    });
+      config.ellipse.click(   function(){ that.tool('ellipse');   });
+      config.rectangle.click( function(){ that.tool('rectangle'); });
+      config.triangle.click(  function(){ that.tool('triangle');  });
+      config.line.click(      function(){ that.tool('line');      });
+      config.draw.click(      function(){ that.tool('draw');      });
+
+      this.tool = function(t){
+        if(t && t != tool){
+          tool = t;
+          that.fabricCanvas.fire('tool:change',tool);
+          return tool;
+        } else {
+          return tool;
+        }
+      };
+    };
+
+  };
+
+}());
+
+DrawingFabric.Functionality.drawWithMouse = (function(){
+
+  var utils = DrawingFabric.utils;
+
+  return function(){
+
+    this.initialize = function(){
+      var that = this;
+
+      var drawing = false;
+
+      this.fabricCanvas.on('tool:change',function(t){
+        console.warn('tool:change');
+        if(t == 'draw'){
+          drawing = true;
+          that.fabricCanvas.isDrawingMode = true;
+
+        } else if (drawing){
+          drawing = false;
+          that.fabricCanvas.isDrawingMode = false;
+        }
+      });
+
     };
 
   };

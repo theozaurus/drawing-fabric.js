@@ -8,12 +8,14 @@ $(function(){
     ellipse:   $('.js-tools-ellipse'),
     rectangle: $('.js-tools-rectangle'),
     triangle:  $('.js-tools-triangle'),
-    line:      $('.js-tools-line')
+    line:      $('.js-tools-line'),
+    draw:      $('.js-tools-draw')
   }));
   c.addFunctionality(new DrawingFabric.Functionality.mouseInfo({
     x:    $('.js-mouse-info-x'),
     y:    $('.js-mouse-info-y')
   }));
+  c.addFunctionality(new DrawingFabric.Functionality.drawWithMouse());
   c.addFunctionality(new DrawingFabric.Functionality.drawShapeWithMouse());
   c.addFunctionality(new DrawingFabric.Functionality.drawLineWithMouse());
   c.addFunctionality(new DrawingFabric.Functionality.selectedProperties({
