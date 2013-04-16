@@ -42,7 +42,7 @@ DrawingFabric.Functionality.keyboardCommands = (function(){
       var element = this.fabricCanvas.upperCanvasEl;
 
       var activeObject = function(){
-        return that.fabricCanvas.getActiveObject();
+        return that.fabricCanvas.getActiveGroup() || that.fabricCanvas.getActiveObject();
       };
 
       var move = function(x,y){
@@ -58,8 +58,21 @@ DrawingFabric.Functionality.keyboardCommands = (function(){
       var destroy = function(){
         var obj = activeObject();
         if(obj){
-          that.fabricCanvas.remove(obj);
+          if(obj.hasOwnProperty('objects')){
+            var objs = obj.objects;
+            for( var i = 0; i < objs.length; i++ ){
+              destroyObject(objs[i]);
+            }
+            that.fabricCanvas.discardActiveGroup();
+            that.fabricCanvas.renderAll();
+          } else {
+            destroyObject(obj);
+          }
         }
+      };
+
+      var destroyObject = function(obj){
+        that.fabricCanvas.remove(obj);
       };
 
       var handle = function(e){
