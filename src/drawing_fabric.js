@@ -115,6 +115,7 @@ DrawingFabric.Functionality.tools = (function(){
       config.ellipse.click(   function(){ tool = 'ellipse';   });
       config.rectangle.click( function(){ tool = 'rectangle'; });
       config.triangle.click(  function(){ tool = 'triangle';  });
+      config.line.click(      function(){ tool = 'line';      });
 
       this.tool = function(){ return tool; };
     };
@@ -123,7 +124,56 @@ DrawingFabric.Functionality.tools = (function(){
 
 }());
 
-DrawingFabric.Functionality.drawWithMouse = (function(){
+DrawingFabric.Functionality.drawLineWithMouse = (function(){
+
+  var utils = DrawingFabric.utils;
+
+  return function(){
+
+    this.initialize = function(){
+      var that = this;
+
+      var drawing = false;
+      var startCoords, path;
+
+      var isPath = function(){
+        return 'line' == that.tool();
+      };
+
+      this.fabricCanvas.on('mouse:move', function(event){
+        if(drawing){
+          if(path){ that.fabricCanvas.remove(path); }
+
+          var coords = utils.mouseCoord(event);
+          path = new fabric.Path('M' + startCoords.x + ',' + startCoords.y+'L'+coords.x+','+coords.y);
+          path.set({
+            stroke: that.stroke()
+          });
+
+          that.fabricCanvas.add(path);
+          that.fabricCanvas.renderAll();
+        }
+      });
+
+      this.fabricCanvas.on('mouse:down', function(event){
+        if(drawing){
+          drawing = false;
+          path    = null;
+        } else if (isPath()) {
+          drawing = true;
+          var coords = utils.mouseCoord(event);
+          startCoords = coords;
+        }
+      });
+
+
+    };
+
+  };
+
+}());
+
+DrawingFabric.Functionality.drawShapeWithMouse = (function(){
 
   return function(){
 
@@ -172,7 +222,7 @@ DrawingFabric.Functionality.drawWithMouse = (function(){
           var object = newObject({
             left:   mouseStartCoord.x,
             top:    mouseStartCoord.y,
-            fill:   that.colour(),
+            fill:   that.fill(),
             active: true
           });
 
@@ -272,8 +322,12 @@ DrawingFabric.Canvas = (function(){
 
     var that = this;
 
-    this.colour = function(){
+    this.fill = function(){
       return 'green';
+    };
+
+    this.stroke = function(){
+      return 'black';
     };
 
     this.fabricCanvas = new fabric.Canvas(canvas_id);

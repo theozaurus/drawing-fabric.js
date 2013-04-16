@@ -7,13 +7,15 @@ $(function(){
     cursor:    $('.js-tools-cursor'),
     ellipse:   $('.js-tools-ellipse'),
     rectangle: $('.js-tools-rectangle'),
-    triangle:  $('.js-tools-triangle')
+    triangle:  $('.js-tools-triangle'),
+    line:      $('.js-tools-line')
   }));
   c.addFunctionality(new DrawingFabric.Functionality.mouseInfo({
     x:    $('.js-mouse-info-x'),
     y:    $('.js-mouse-info-y')
   }));
-  c.addFunctionality(new DrawingFabric.Functionality.drawWithMouse());
+  c.addFunctionality(new DrawingFabric.Functionality.drawShapeWithMouse());
+  c.addFunctionality(new DrawingFabric.Functionality.drawLineWithMouse());
   c.addFunctionality(new DrawingFabric.Functionality.selectedProperties({
     fill:   $('.js-selected-properties-fill'),
     top:    $('.js-selected-properties-top'),
