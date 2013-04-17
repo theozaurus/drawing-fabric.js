@@ -337,7 +337,6 @@ DrawingFabric.Functionality.drawWithMouse = (function(){
       var drawing = false;
 
       this.fabricCanvas.on('tool:change',function(t){
-        console.warn('tool:change');
         if(t == 'draw'){
           drawing = true;
           that.fabricCanvas.isDrawingMode = true;
@@ -459,7 +458,7 @@ DrawingFabric.Functionality.drawShapeWithMouse = (function(){
           object.set('width',0).set('height',0);
 
           that.fabricCanvas.add(object);
-          that.fabricCanvas.setActiveObject(object,event);
+          that.fabricCanvas.setActiveObject(object);
           mouseObject = object;
         }
       });
