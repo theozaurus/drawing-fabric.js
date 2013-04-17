@@ -11,6 +11,28 @@ DrawingFabric.utils = {
   },
   magnitudeBetweenPoints: function(x1,y1,x2,y2){
     return Math.sqrt(Math.pow(x1 - x2,2) + Math.pow(y1 - y2,2));
+  },
+  angleFromHorizontal: function(x,y){
+    // Avoid divide by 0
+    if(x === 0){ if(y >= 0){ return Math.PI * 0.5; } else { return Math.PI * 1.5; } }
+    if(y === 0){ if(x >= 0){ return 0;             } else { return Math.PI;       } }
+
+    var quadrant, opposite, adjacent;
+    if(y >= 0){
+      if(x >= 0){
+        quadrant = 0; opposite = y; adjacent = x;
+      } else {
+        quadrant = 0.5; opposite = x; adjacent = y;
+      }
+    } else {
+      if(x < 0){
+        quadrant = 1; opposite = y; adjacent = x;
+      } else {
+        quadrant = 1.5; opposite = x; adjacent = y;
+      }
+    }
+
+    return Math.abs(Math.atan( opposite / adjacent )) + quadrant * Math.PI;
   }
 };
 
@@ -132,6 +154,7 @@ DrawingFabric.Functionality.tools = (function(){
       config.triangle.click(  function(){ that.tool('triangle');  });
       config.line.click(      function(){ that.tool('line');      });
       config.draw.click(      function(){ that.tool('draw');      });
+      config.arc.click(       function(){ that.tool('arc');       });
 
       this.tool = function(t){
         if(t && t != tool){
@@ -142,6 +165,160 @@ DrawingFabric.Functionality.tools = (function(){
           return tool;
         }
       };
+    };
+
+  };
+
+}());
+
+DrawingFabric.Functionality.drawArcWithMouse = (function(){
+
+  var utils = DrawingFabric.utils;
+
+  return function(){
+
+    this.initialize = function(){
+      var that = this;
+      var stage, coordinates, shape, guide;
+
+      var isArc = function(){
+        return that.tool() == 'arc';
+      };
+
+      var center = function(event){
+        coordinates.center = utils.mouseCoord(event);
+
+        stage = 'firstPoint';
+      };
+
+      var radius = function(){
+        return utils.magnitudeBetweenPoints(
+          coordinates.center.x,     coordinates.center.y,
+          coordinates.firstPoint.x, coordinates.firstPoint.y
+        );
+      };
+
+      var endOfArc = function(angle){
+        var r = radius();
+
+        var coords = {};
+        coords.x = (Math.cos(angle) * r + coordinates.center.x);
+        coords.y = (Math.sin(angle) * r + coordinates.center.y);
+
+        return coords;
+      };
+
+      var guideCircle = function(){
+        if(guide){ that.fabricCanvas.remove(guide); }
+
+        guide = new fabric.Circle({
+          left:            coordinates.center.x,
+          top:             coordinates.center.y,
+          fill:            'none',
+          stroke:          that.stroke(),
+          selectable:      false
+        });
+        guide.set('opacity',0.1);
+        guide.setRadius(radius());
+
+        that.fabricCanvas.add(guide);
+      };
+
+      var arcCommand = function(){
+        var r = radius();
+
+        var x1 = coordinates.firstPoint.x - coordinates.center.x;
+        var y1 = coordinates.firstPoint.y - coordinates.center.y;
+        var a1 = utils.angleFromHorizontal(x1,y1);
+
+        var x2 = coordinates.secondPoint.x - coordinates.center.x;
+        var y2 = coordinates.secondPoint.y - coordinates.center.y;
+        var a2 = utils.angleFromHorizontal(x2,y2);
+
+        var sweepAngle = a2 > a1 ? a2 - a1 : 2 * Math.PI + a2 - a1;
+        var sweep = sweepAngle > Math.PI ? '1,1' : '0,1';
+
+        var deg = function(rad){ return 180 * rad / Math.PI; };
+
+        var endCoords = endOfArc(a2);
+
+        return 'M'+coordinates.firstPoint.x+','+coordinates.firstPoint.y+' A'+r+','+r+' 0 '+sweep+' '+endCoords.x+','+endCoords.y;
+      };
+
+      var firstPoint = function(event){
+        coordinates.firstPoint = utils.mouseCoord(event);
+
+        stage = 'secondPoint';
+      };
+
+      var firstPointGuide = function(event){
+        coordinates.firstPoint = utils.mouseCoord(event);
+
+        guideCircle();
+      };
+
+      var secondPoint = function(event){
+        if(shape){ that.fabricCanvas.remove(shape); }
+
+        shape = new fabric.Path(arcCommand());
+        shape.set('fill','none');
+        shape.set('stroke',that.stroke());
+
+        that.fabricCanvas.add(shape);
+        that.fabricCanvas.remove(guide);
+
+        reset();
+      };
+
+      var secondPointGuide = function(event){
+        coordinates.secondPoint = utils.mouseCoord(event);
+
+        if(shape){ that.fabricCanvas.remove(shape); }
+
+        shape = new fabric.Path(arcCommand());
+        shape.set('fill','none');
+        shape.set('stroke',that.stroke());
+
+        that.fabricCanvas.add(shape);
+      };
+
+      var reset = function(){
+        stage = 'center';
+        coordinates = {};
+        shape = null;
+        guide = null;
+      };
+      reset();
+
+      this.fabricCanvas.on('mouse:move',function(event){
+        if(isArc()){
+          switch(stage){
+          case 'firstPoint':
+            firstPointGuide(event);
+            break;
+          case 'secondPoint':
+            secondPointGuide(event);
+            break;
+          }
+        }
+      });
+
+      this.fabricCanvas.on('mouse:down',function(event){
+        if(isArc()){
+          switch(stage){
+          case 'center':
+            if(!event.target){center(event);}
+            break;
+          case 'firstPoint':
+            firstPoint(event);
+            break;
+          case 'secondPoint':
+            secondPoint(event);
+            break;
+          }
+        }
+      });
+
     };
 
   };
