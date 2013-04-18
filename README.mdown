@@ -1,0 +1,78 @@
+Drawing Fabric
+==============
+
+Drawing Fabric is designed to create a highly configurable and extendable vector
+drawing editor built on top of [Fabric.js](http://fabricjs.com/).
+
+It achieves this by using `Functionality` blocks. These are used in combination
+with each other to build an editor that suits what you need. Please check out
+the demo page and source to see how this in action.
+
+By allowing all functionality blocks to be optional the production codebase size
+can be kept to a minimum.
+
+Usage
+=====
+
+After DOM load, we need to initalize the `DrawingFabric.Canvas` like so:
+
+    var c = new DrawingFabric.Canvas('canvas');
+
+We can then start bolting the functionality we want into it. For example we may
+want a simple one that adds double click support:
+
+    c.addFunctionality(new DrawingFabric.Functionality.addDoubleClick());
+
+This will use the existing fabric.js event mechanism to trigger a new event
+called `object:dblselected`.
+
+Some things are more complicated, and we need to be able to configure them. Say
+for example we want a widget that tracks where the mouse is. We can pass it
+information about where we want the results in our DOM, and it'll take care of
+the rest:
+
+    c.addFunctionality(new DrawingFabric.Functionality.mouseInfo({
+      x: $('.js-mouse-info-x'),
+      y: $('.js-mouse-info-y')
+    }));
+
+Functionality Blocks
+====================
+
+Here's a list of what functionality has been created so far:
+
+  - __keyboardEvents__ - Adds `key:down` event
+  - __keyboardCommands__ - Allows objects to be moved and deleted using the keyboard
+  - __tools__ - Provides a very simple tool selector (cursor, ellipse, ...) that is used by other parts of functionality
+  - __mouseInfo__ - Updates a part of the DOM with mouse coordinates
+  - __addDoubleClick__ - Adds `object:dblselected` event
+  - __addText__ - Enables text boxes to drawn and edited within page with the mouse
+  - __drawWithMouse__ - Allows freehand lines to be drawn with the mouse
+  - __drawShapeWithMouse__ - Allows basic shapes (rectangles, ellipses and triangles) to be drawn
+  - __drawArcWithMouse__ - Can draw an arc on the page using the mouse to set centre, radius and sweep
+  - __drawLineWithMouse__ - Allows straight lines to be drawn on the page
+  - __selectedProperties__ - Shows what properties the selected object has (stroke, colour, ...)
+
+TODO
+====
+
+This project is very much in it's infancy, here is what is top of the list:
+
+ - Switch to Sprockets to split up Javascript
+ - Tools for controlling object properties like fill, stroke, font etc.
+ - Adjust how focus works so that items are not accidentally drawn when
+   selecting, or selected when drawing.
+ - Skin UI of demo
+ - Look into ways of testing the blocks.
+ - Some kind of 'traits' system so that interdependencies of Functionality can
+   be described
+ - Remove jQuery dependency for Functionality blocks that use it.
+ - Manipulating external images
+ - Documentation
+ - ...
+
+Contributing
+============
+
+Please make pull requests for new bits of funtionality, or fine tuning existing
+functionality.
