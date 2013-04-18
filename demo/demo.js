@@ -10,12 +10,15 @@ $(function(){
     triangle:  $('.js-tools-triangle'),
     line:      $('.js-tools-line'),
     draw:      $('.js-tools-draw'),
-    arc:       $('.js-tools-arc')
+    arc:       $('.js-tools-arc'),
+    text:      $('.js-tools-text')
   }));
   c.addFunctionality(new DrawingFabric.Functionality.mouseInfo({
     x:    $('.js-mouse-info-x'),
     y:    $('.js-mouse-info-y')
   }));
+  c.addFunctionality(new DrawingFabric.Functionality.addDoubleClick());
+  c.addFunctionality(new DrawingFabric.Functionality.addText());
   c.addFunctionality(new DrawingFabric.Functionality.drawWithMouse());
   c.addFunctionality(new DrawingFabric.Functionality.drawArcWithMouse());
   c.addFunctionality(new DrawingFabric.Functionality.drawShapeWithMouse());

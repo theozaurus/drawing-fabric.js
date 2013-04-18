@@ -64,7 +64,8 @@ DrawingFabric.Functionality.keyboardCommands = (function(){
       var element = this.fabricCanvas.upperCanvasEl;
 
       var activeObject = function(){
-        return that.fabricCanvas.getActiveGroup() || that.fabricCanvas.getActiveObject();
+        var obj = that.fabricCanvas.getActiveGroup() || that.fabricCanvas.getActiveObject();
+        if(obj && !obj.get('dblselected')){ return obj; }
       };
 
       var move = function(x,y){
@@ -97,7 +98,7 @@ DrawingFabric.Functionality.keyboardCommands = (function(){
         that.fabricCanvas.remove(obj);
       };
 
-      var handle = function(e){
+      this.fabricCanvas.on('key:down',function(e){
         var scale = (e.shiftKey && 10) || 1;
 
         switch(e.which){
@@ -122,14 +123,6 @@ DrawingFabric.Functionality.keyboardCommands = (function(){
         case 46: // delete
           destroy();
         }
-      };
-
-      $(document).mousedown(function(e){
-        lastDownTarget = e.target;
-      });
-
-      $(document).keydown(function(e){
-        if(lastDownTarget == element){ handle(e); }
       });
 
     };
@@ -155,6 +148,7 @@ DrawingFabric.Functionality.tools = (function(){
       config.line.click(      function(){ that.tool('line');      });
       config.draw.click(      function(){ that.tool('draw');      });
       config.arc.click(       function(){ that.tool('arc');       });
+      config.text.click(      function(){ that.tool('text');      });
 
       this.tool = function(t){
         if(t && t != tool){
@@ -504,6 +498,234 @@ DrawingFabric.Functionality.drawShapeWithMouse = (function(){
           that.fabricCanvas.renderAll();
         }
       });
+    };
+
+  };
+
+}());
+
+
+DrawingFabric.Functionality.addDoubleClick = (function(){
+
+  return function(){
+
+    this.initialize = function(){
+
+      var that = this;
+
+      var obj;
+
+      var handle = function(event){
+        obj = that.fabricCanvas.getActiveObject();
+        if(obj){
+          obj.set('dblselected',true);
+          that.fabricCanvas.fire('object:dblselected',{e: event, target: obj});
+        }
+      };
+
+      that.fabricCanvas.on('before:selection:cleared', function(){
+        obj = that.fabricCanvas.getActiveObject();
+        if(obj){
+          obj.set('dblselected',false);
+          obj = null;
+        }
+      });
+
+      fabric.util.addListener(this.fabricCanvas.upperCanvasEl, 'dblclick', handle);
+    };
+
+  };
+
+}());
+
+DrawingFabric.Functionality.addText = (function(){
+
+  var utils = DrawingFabric.utils;
+
+  return function(){
+
+    this.initialize = function(){
+
+      var that = this;
+
+      var selectedObj;
+      var $hiddenInput;
+
+      var createHiddenInput = function(){
+        if($hiddenInput){return;}
+        $hiddenInput = $('<textarea></textarea>');
+        // $hiddenInput.css('position','absolute');
+        // $hiddenInput.css('left','-900000px');
+        $(that.fabricCanvas.wrapperEl).append($hiddenInput);
+      };
+      createHiddenInput();
+
+      var isText = function(){
+        return that.tool() == 'text';
+      };
+
+      var activeTextObject = function(obj){
+        return obj instanceof fabric.Text && obj;
+      };
+
+      var setupHiddenInput = function(obj){
+        $hiddenInput.val(obj.text);
+        $hiddenInput.focus();
+      };
+
+      var context = function(){
+        return that.fabricCanvas.getSelectionContext();
+      };
+
+      var withContext = function(yield){
+        var ctx = context();
+        ctx.save();
+        ctx.font = selectedObj._getFontDeclaration();
+        yield(ctx);
+        ctx.restore();
+      };
+
+      var canvasPositionToCursorIndex = function(x,y){
+
+      };
+
+      var cursor;
+      var cursorBlinker;
+      var lastCoords;
+      var renderCursor = function(coords){
+        if(coords != lastCoords){
+          removeCursor();
+          cursor = new fabric.Rect({
+            top:     coords.y,
+            left:    coords.x,
+            originY: 'top',
+            originX: 'left',
+            height:  coords.dy,
+            width:   1,
+            angle:   coords.angle
+          });
+          cursorBlinker = setInterval(function(){
+            cursor.set('opacity', !cursor.opacity ? 1 : 0);
+            that.fabricCanvas.renderAll();
+          }, 500);
+          that.fabricCanvas.add(cursor);
+          lastCoords = coords;
+        }
+      };
+
+      var removeCursor = function(){
+        if(cursor){
+          that.fabricCanvas.remove(cursor);
+          clearInterval(cursorBlinker);
+        }
+      };
+
+      var cursorIndexToCanvasPosition = function(cursorIndex){
+        var dx,dy,x,y;
+
+        withContext(function(ctx){
+          var text = selectedObj.text;
+
+          // Iterate over the character to find which line the index is on
+          // and how many characters in it is
+          var newLineCount      = 0;
+          var charsSinceNewLine = 0;
+
+          for(var i=0; i < cursorIndex; i++){
+            if(text[i] == '\n'){
+              newLineCount += 1;
+              charsSinceNewLine = 0;
+            } else {
+              charsSinceNewLine += 1;
+            }
+          }
+
+          var snippet = text.slice(cursorIndex - charsSinceNewLine,cursorIndex);
+
+          dx = ctx.measureText(snippet).width;
+          dy = selectedObj.fontSize * selectedObj.lineHeight;
+
+          // Translate to coordinates relative to canvas
+          x  = dx * selectedObj.scaleX + selectedObj.left;
+          y  = dy * selectedObj.scaleY * newLineCount + selectedObj.top;
+          dy = dy * selectedObj.scaleY;
+
+          var point    = new fabric.Point( x, y );
+          var origin   = new fabric.Point( selectedObj.left, selectedObj.top );
+          var angle    = fabric.util.degreesToRadians(selectedObj.angle);
+
+          var rotatedPoint = fabric.util.rotatePoint(point,origin,angle);
+          results = {
+            x:     rotatedPoint.x,
+            y:     rotatedPoint.y,
+            angle: selectedObj.angle,
+            dy:    dy
+          };
+        });
+
+        return results;
+      };
+
+      var cursorIndex = function(){
+        return $hiddenInput[0].selectionStart;
+      };
+
+      var handleCursor = function(){
+        renderCursor(cursorIndexToCanvasPosition(cursorIndex()));
+      };
+
+      $hiddenInput.keyup(function(e){
+        if(selectedObj){
+          selectedObj.set('text',$hiddenInput.val());
+          handleCursor();
+          that.fabricCanvas.renderAll();
+        }
+      });
+
+      this.fabricCanvas.on('object:dblselected', function(event){
+        selectedObj = activeTextObject(event.target);
+        if(selectedObj){
+          handleCursor();
+          setupHiddenInput(selectedObj);
+        }
+      });
+
+      this.fabricCanvas.on('selection:cleared', function(event){
+        selectedObj = null;
+        removeCursor();
+      });
+
+      var update = function(){
+        if(selectedObj){ setupHiddenInput(selectedObj); handleCursor(); }
+      };
+
+      this.fabricCanvas.on('object:scaling',  update);
+      this.fabricCanvas.on('object:rotating', update);
+      this.fabricCanvas.on('object:moving',   update);
+
+      this.fabricCanvas.on('mouse:down', function(event){
+        if(isText()){
+          var coords = utils.mouseCoord(event);
+
+          var obj = new fabric.Text('',{
+            left:        coords.x,
+            top:         coords.y,
+            originY:     'top',
+            originX:     'left',
+            active:      true,
+            dblselected: true
+          });
+
+          that.fabricCanvas.add(obj);
+          that.fabricCanvas.setActiveObject(obj);
+
+          // Disgusting hack that seems to make sure the textarea gets focused
+          setTimeout(function(){
+            that.fabricCanvas.fire('object:dblselected',{target:obj,e:event.e});
+          },1);
+        }
+      });
+
     };
 
   };
