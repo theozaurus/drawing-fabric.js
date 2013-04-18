@@ -1,6 +1,7 @@
 $(function(){
   c = new DrawingFabric.Canvas('canvas');
 
+  c.addFunctionality(new DrawingFabric.Functionality.keyboardEvents()); // Required by keybaordCommands
   c.addFunctionality(new DrawingFabric.Functionality.keyboardCommands());
 
   c.addFunctionality(new DrawingFabric.Functionality.tools({

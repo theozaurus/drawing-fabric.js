@@ -53,7 +53,7 @@ DrawingFabric.Functionality.mouseInfo = (function(){
 
 }());
 
-DrawingFabric.Functionality.keyboardCommands = (function(){
+DrawingFabric.Functionality.keyboardEvents = (function(){
 
   return function(config){
 
@@ -62,6 +62,31 @@ DrawingFabric.Functionality.keyboardCommands = (function(){
       var lastDownTarget;
       var that = this;
       var element = this.fabricCanvas.upperCanvasEl;
+
+      $(document).mousedown(function(e){
+        lastDownTarget = e.target;
+      });
+
+      $(document).keydown(function(e){
+        if(lastDownTarget == element){ that.fabricCanvas.fire('key:down',e); }
+        // Prevent bubbling
+        // Keyboard events should use our key:down method
+        // Helps stop page scrolling when using cursor keys
+        return false;
+      });
+
+    };
+  };
+
+}());
+
+DrawingFabric.Functionality.keyboardCommands = (function(){
+
+  return function(config){
+
+    this.initialize = function(){
+
+      var that = this;
 
       var activeObject = function(){
         var obj = that.fabricCanvas.getActiveGroup() || that.fabricCanvas.getActiveObject();
