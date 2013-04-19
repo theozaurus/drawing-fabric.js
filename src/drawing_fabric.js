@@ -68,11 +68,13 @@ DrawingFabric.Functionality.keyboardEvents = (function(){
       });
 
       $(document).keydown(function(e){
-        if(lastDownTarget == element){ that.fabricCanvas.fire('key:down',e); }
-        // Prevent bubbling
-        // Keyboard events should use our key:down method
-        // Helps stop page scrolling when using cursor keys
-        return false;
+        if(lastDownTarget == element && $(':focus').length === 0){
+          that.fabricCanvas.fire('key:down',e);
+          // Prevent bubbling
+          // Keyboard events should use our key:down method
+          // Helps stop page scrolling when using cursor keys
+          return false;
+        }
       });
 
     };
