@@ -1,11 +1,22 @@
 <html>
   <head>
     <title>Drawing Fabric</title>
-    <link rel='stylesheet' type='text/css' href='./bootstrap.css'>
+    <!-- External styling -->
+    <link rel='stylesheet' type='text/css' href='./vendor/bootstrap.css'>
+    <link rel='stylesheet' type='text/css' href='./vendor/spectrum.css'>
+
+    <!-- The demo styling -->
     <link rel='stylesheet' type='text/css' href='./application.css'>
-    <script type='text/javascript' src='../src/drawing_fabric.js'></script>
+
+    <!-- External script dependencies  -->
+    <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js'></script>
     <script type='text/javascript' src='../vendor/fabric.js'></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+    <script type='text/javascript' src='./vendor/spectrum.js'></script>
+
+    <!-- The library -->
+    <script type='text/javascript' src='../src/drawing_fabric.js'></script>
+
+    <!-- The demo config -->
     <script type='text/javascript' src='./demo.js'></script>
   </head>
   <body>
@@ -43,20 +54,27 @@
           </div>
           <div class='properties well'>
             <dl>
-              <dt>Fill Colour</dt>
-              <dd class='js-selected-properties-fill'></dd>
+              <dt>Stroke Width</dt>
+              <dd>
+                <select type="text" class="js-selected-properties-stroke-width span1">
+                  <option value='1'>1</option>
+                  <option value='2'>2</option>
+                  <option value='3'>3</option>
+                  <option value='4'>4</option>
+                  <option value='5'>5</option>
+                </select>
+              </dd>
 
-              <dt>Top</dt>
-              <dd class='js-selected-properties-top'></dd>
+              <dt>Fill</dt>
+              <dd>
+                <input type='text' class='js-selected-properties-fill span1 js-color'></input>
+              </dd>
 
-              <dt>Left</dt>
-              <dd class='js-selected-properties-left'></dd>
+              <dt>Stroke</dt>
+              <dd>
+                <input type='text' class='js-selected-properties-stroke span1 js-color'></input>
+              </dd>
 
-              <dt>Width</dt>
-              <dd class='js-selected-properties-width'></dd>
-
-              <dt>Height</dt>
-              <dd class='js-selected-properties-height'></dd>
             </ul>
           </div>
         </div>

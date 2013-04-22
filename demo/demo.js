@@ -25,12 +25,16 @@ $(function(){
   c.addFunctionality(new DrawingFabric.Functionality.drawShapeWithMouse());
   c.addFunctionality(new DrawingFabric.Functionality.drawLineWithMouse());
   c.addFunctionality(new DrawingFabric.Functionality.selectedProperties({
-    fill:   $('.js-selected-properties-fill'),
-    top:    $('.js-selected-properties-top'),
-    left:   $('.js-selected-properties-left'),
-    width:  $('.js-selected-properties-width'),
-    height: $('.js-selected-properties-height')
+    strokeWidth: $('.js-selected-properties-stroke-width'),
+    stroke:      $('.js-selected-properties-stroke'),
+    fill:        $('.js-selected-properties-fill')
   }));
+
+  $('.js-color').spectrum({
+    showAlpha:       true,
+    preferredFormat: 'rgb'
+  });
+
 
 });
 

@@ -250,8 +250,8 @@ DrawingFabric.Functionality.drawArcWithMouse = (function(){
           left:            coordinates.center.x,
           top:             coordinates.center.y,
           fill:            'none',
-          stroke:          that.stroke(),
-          strokeWidth:     that.strokeWidth(),
+          stroke:          that.properties.stroke(),
+          strokeWidth:     that.properties.strokeWidth(),
           selectable:      false
         });
         guide.set('opacity',0.1);
@@ -284,8 +284,8 @@ DrawingFabric.Functionality.drawArcWithMouse = (function(){
       var arc = function(){
         shape = new fabric.Path(arcCommand());
         shape.set('fill','none');
-        shape.set('stroke',that.stroke());
-        shape.set('strokeWidth',that.strokeWidth());
+        shape.set('stroke',that.properties.stroke());
+        shape.set('strokeWidth',that.properties.strokeWidth());
         return shape;
       };
 
@@ -380,8 +380,8 @@ DrawingFabric.Functionality.drawWithMouse = (function(){
         if(t == 'draw'){
           drawing = true;
           that.fabricCanvas.isDrawingMode = true;
-          that.fabricCanvas.freeDrawingColor     = that.stroke();
-          that.fabricCanvas.freeDrawingLineWidth = that.strokeWidth();
+          that.fabricCanvas.freeDrawingColor     = that.properties.stroke();
+          that.fabricCanvas.freeDrawingLineWidth = that.properties.strokeWidth();
 
         } else if (drawing){
           drawing = false;
@@ -418,8 +418,8 @@ DrawingFabric.Functionality.drawLineWithMouse = (function(){
           var coords = utils.mouseCoord(event);
           path = new fabric.Path('M' + startCoords.x + ',' + startCoords.y+'L'+coords.x+','+coords.y);
           path.set({
-            stroke:      that.stroke(),
-            strokeWidth: that.strokeWidth()
+            stroke:      that.properties.stroke(),
+            strokeWidth: that.properties.strokeWidth()
           });
 
           that.fabricCanvas.add(path);
@@ -494,9 +494,9 @@ DrawingFabric.Functionality.drawShapeWithMouse = (function(){
           var object = newObject({
             left:        mouseStartCoord.x,
             top:         mouseStartCoord.y,
-            fill:        that.fill(),
-            stroke:      that.stroke(),
-            strokeWidth: that.strokeWidth(),
+            fill:        that.properties.fill(),
+            stroke:      that.properties.stroke(),
+            strokeWidth: that.properties.strokeWidth(),
             active:      true
           });
 
@@ -880,28 +880,80 @@ DrawingFabric.Functionality.selectedProperties = (function(){
   return function(config){
 
     this.initialize = function(){
-      var that = this;
 
-      var update = function(event){
-        var shape = event.target;
-        config.fill.html(shape.fill);
-        config.top.html(shape.top);
-        config.left.html(shape.left);
-        config.width.html(shape.get('width'));
-        config.height.html(shape.get('height'));
+      var eachConfig = function(fun){
+        for(var n in config){
+          if(config.hasOwnProperty(n) && that.properties.hasOwnProperty(n)){
+            fun(n);
+          }
+        }
       };
 
-      this.fabricCanvas.on('object:selected', update);
-      this.fabricCanvas.on('object:modified', update);
-      this.fabricCanvas.on('object:scaling',  update);
-      this.fabricCanvas.on('object:moving',   update);
+      var domInputChangeFactory = function(property){
+        return function(event){
+          var value = $(event.target).val();
+          var parsedValue = that.properties[property](value);
+          if(supported && supported.indexOf(property) >= 0){
+            lastShape.set(property,value);
+            that.fabricCanvas.renderAll();
+          }
+        };
+      };
+
+      var bindDomElements = function(){
+        eachConfig(function(n){
+          var $e = config[n];
+          var defaultValue = that.properties[n]();
+          $e.change(domInputChangeFactory(n));
+          $e.val( defaultValue );
+        });
+      };
+
+      var supportedProperties = function(shape){
+        var properties          = that.properties;
+        var shapeProperties     = shape.originalState;
+        var supportedProperties = [];
+        for(var p in properties){
+          if(properties.hasOwnProperty(p) && shapeProperties.hasOwnProperty(p)){
+            supportedProperties.push(p);
+          }
+        }
+        return supportedProperties;
+      };
+
+      var that = this;
+
+      bindDomElements();
+
+      var lastShape;
+      var supported;
+      var updateDOM = function(event){
+        var shape = event.target;
+
+        if(lastShape != shape){ supported = supportedProperties(shape); }
+
+        eachConfig(function(n){
+          config[n].val(shape.get(n));
+        });
+
+        lastShape = shape;
+      };
+
+      var updateShape = function(property,value){
+        if(lastShape){
+          lastShape.set(property,value);
+          that.fabricCanvas.renderAll();
+        }
+      };
+
+      this.fabricCanvas.on('object:selected', updateDOM);
+      this.fabricCanvas.on('object:modified', updateDOM);
+      this.fabricCanvas.on('object:scaling',  updateDOM);
+      this.fabricCanvas.on('object:moving',   updateDOM);
 
       this.fabricCanvas.on('selection:cleared', function(event){
-        config.fill.html('');
-        config.top.html('');
-        config.left.html('');
-        config.width.html('');
-        config.height.html('');
+        lastShape = null;
+        supported = null;
       });
 
     };
@@ -912,21 +964,57 @@ DrawingFabric.Functionality.selectedProperties = (function(){
 
 DrawingFabric.Canvas = (function(){
 
+  var Property = (function(){
+
+    return function(config){
+      this.parser  = config.parser || function(newVal){ return newVal; };
+      this.initial = config.initial;
+    };
+
+  })();
+
+  buildProperties = function(){
+    var properties = {};
+
+    var toolProperties = {
+      'fill':                new Property({initial: 'rgba(255, 255, 255, 0)'}),
+      'stroke':              new Property({initial: 'black'}),
+      'strokeWidth':         new Property({initial: 2, parser: function(v){ return parseInt(v,10); }}),
+      'strokeDashArray':     new Property({initial: null}),
+      'fontFamily':          new Property({initial: 'sans-serif'}), // serif, monospace, cursive, fantasy
+      'fontStyle':           new Property({initial: 'normal'}),     // italic, oblique
+      'fontWeight':          new Property({initial: 'normal'}),     // bold, bolder, lighter
+      'lineHeight':          new Property({initial: 1.3, parser: function(v){ return parseFloat(v); }}),
+      'textBackgroundColor': new Property({initial: 'none'}),
+      'textDecoration':      new Property({initial: 'none'}),       // underline, overline, line-through
+      'textShadow':          new Property({initial: ''})
+    };
+
+    var propertySetterFactory = function(property){
+      var stored = property.initial;
+      return function(v){
+        if(typeof v != 'undefined'){
+          stored = property.parser(v);
+        }
+        return stored;
+      };
+    };
+
+    for(var name in toolProperties){
+      if(toolProperties.hasOwnProperty(name)){
+        var property = toolProperties[name];
+        properties[name] = propertySetterFactory(property);
+      }
+    }
+
+    return properties;
+  };
+
   return function(canvas_id){
 
     var that = this;
 
-    this.fill = function(){
-      return 'none';
-    };
-
-    this.stroke = function(){
-      return 'black';
-    };
-
-    this.strokeWidth = function(){
-      return 2;
-    };
+    this.properties = buildProperties();
 
     this.fabricCanvas = new fabric.Canvas(canvas_id);
 
