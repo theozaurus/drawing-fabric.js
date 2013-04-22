@@ -1,0 +1,7 @@
+.inline {
+  display: inline-block;
+}
+
+.btn-group-vertical {
+  vertical-align: top;
+}
