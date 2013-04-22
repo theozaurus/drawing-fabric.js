@@ -237,6 +237,7 @@ DrawingFabric.Functionality.drawArcWithMouse = (function(){
           top:             coordinates.center.y,
           fill:            'none',
           stroke:          that.stroke(),
+          strokeWidth:     that.strokeWidth(),
           selectable:      false
         });
         guide.set('opacity',0.1);
@@ -266,6 +267,14 @@ DrawingFabric.Functionality.drawArcWithMouse = (function(){
         return 'M'+coordinates.firstPoint.x+','+coordinates.firstPoint.y+' A'+r+','+r+' 0 '+sweep+' '+endCoords.x+','+endCoords.y;
       };
 
+      var arc = function(){
+        shape = new fabric.Path(arcCommand());
+        shape.set('fill','none');
+        shape.set('stroke',that.stroke());
+        shape.set('strokeWidth',that.strokeWidth());
+        return shape;
+      };
+
       var firstPoint = function(event){
         coordinates.firstPoint = utils.mouseCoord(event);
 
@@ -281,9 +290,7 @@ DrawingFabric.Functionality.drawArcWithMouse = (function(){
       var secondPoint = function(event){
         if(shape){ that.fabricCanvas.remove(shape); }
 
-        shape = new fabric.Path(arcCommand());
-        shape.set('fill','none');
-        shape.set('stroke',that.stroke());
+        shape = arc();
 
         that.fabricCanvas.add(shape);
         that.fabricCanvas.remove(guide);
@@ -296,9 +303,7 @@ DrawingFabric.Functionality.drawArcWithMouse = (function(){
 
         if(shape){ that.fabricCanvas.remove(shape); }
 
-        shape = new fabric.Path(arcCommand());
-        shape.set('fill','none');
-        shape.set('stroke',that.stroke());
+        shape = shape = arc();
 
         that.fabricCanvas.add(shape);
       };
@@ -361,6 +366,8 @@ DrawingFabric.Functionality.drawWithMouse = (function(){
         if(t == 'draw'){
           drawing = true;
           that.fabricCanvas.isDrawingMode = true;
+          that.fabricCanvas.freeDrawingColor     = that.stroke();
+          that.fabricCanvas.freeDrawingLineWidth = that.strokeWidth();
 
         } else if (drawing){
           drawing = false;
@@ -397,7 +404,8 @@ DrawingFabric.Functionality.drawLineWithMouse = (function(){
           var coords = utils.mouseCoord(event);
           path = new fabric.Path('M' + startCoords.x + ',' + startCoords.y+'L'+coords.x+','+coords.y);
           path.set({
-            stroke: that.stroke()
+            stroke:      that.stroke(),
+            strokeWidth: that.strokeWidth()
           });
 
           that.fabricCanvas.add(path);
@@ -470,10 +478,12 @@ DrawingFabric.Functionality.drawShapeWithMouse = (function(){
           mouseState      = 'down';
 
           var object = newObject({
-            left:   mouseStartCoord.x,
-            top:    mouseStartCoord.y,
-            fill:   that.fill(),
-            active: true
+            left:        mouseStartCoord.x,
+            top:         mouseStartCoord.y,
+            fill:        that.fill(),
+            stroke:      that.stroke(),
+            strokeWidth: that.strokeWidth(),
+            active:      true
           });
 
           object.set('width',0).set('height',0);
@@ -893,11 +903,15 @@ DrawingFabric.Canvas = (function(){
     var that = this;
 
     this.fill = function(){
-      return 'green';
+      return 'none';
     };
 
     this.stroke = function(){
       return 'black';
+    };
+
+    this.strokeWidth = function(){
+      return 2;
     };
 
     this.fabricCanvas = new fabric.Canvas(canvas_id);
