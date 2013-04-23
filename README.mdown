@@ -53,12 +53,35 @@ Here's a list of what functionality has been created so far:
   - __drawLineWithMouse__ - Allows straight lines to be drawn on the page
   - __selectedProperties__ - Shows what properties the selected object has (stroke, colour, ...)
 
+Building
+========
+
+In order to help maintainability the code (found in `src`) is split into
+multiple files. [Sprockets](https://github.com/sstephenson/sprockets) is used
+to describe the dependencies between the files. If you want to use this code
+in something like Rails with the asset pipeline, then just copy the `src`
+directory to your project and let that deal with the build dependencies. This
+allows you to specify exactly what bits of DrawingFabric you need.
+
+However, if you just need a file with everything in it then that can be found in
+the `build` directory.
+
+If you want to generate a new version of this you must first install
+[Ruby](http://ruby-lang.org) and [Bundler](http://gembundler.com/).
+
+Once you have this:
+
+  $ bundle install
+  $ bundle exec rake build
+
+This will create a new copy of the code in the `build` folder. It will not
+package any external dependencies (jQuery, fabric.js).
+
 TODO
 ====
 
 This project is very much in it's infancy, here is what is top of the list:
 
- - Switch to Sprockets to split up Javascript
  - Refactor tools for controlling object properties like fill, stroke, font etc, the code here can be simplified.
  - Adjust how focus works so that items are not accidentally drawn when
    selecting, or selected when drawing.
