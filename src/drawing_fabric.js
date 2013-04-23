@@ -859,6 +859,9 @@ DrawingFabric.Functionality.addText = (function(){
             fontSize:    that.properties.fontSize(),
             fontStyle:   that.properties.fontStyle(),
             lineHeight:  that.properties.lineHeight(),
+            // TODO: Makes more sense to map to fill to stroke
+            // Need to think of higher level mechanism to represent this
+            stroke:      that.properties.fill(),
             active:      true,
             dblselected: true
           });
@@ -894,6 +897,7 @@ DrawingFabric.Functionality.selectedProperties = (function(){
       };
 
       var setDomElementValue = function($element,value){
+        if(value === null || value == "none"){ return; }
         if($element.is('[type="checkbox"]')){
           $element.prop("checked",value == $element.val());
         } else {
@@ -919,7 +923,7 @@ DrawingFabric.Functionality.selectedProperties = (function(){
           var value = getDomElementValue($(event.target));
           var parsedValue = that.properties[property](value);
           if(currentShape && supported && supported.indexOf(property) >= 0){
-            currentShape.set(property,parsedValue);
+            currentShape.set(propertyName(property),parsedValue);
             that.fabricCanvas.renderAll();
           }
         };
@@ -960,14 +964,34 @@ DrawingFabric.Functionality.selectedProperties = (function(){
 
         eachConfig(function(n){
           if(supported.indexOf(n) >= 0){
-            setDomElementValue(config[n],shape.get(n));
+            setDomElementValue(config[n],currentShape.get(propertyName(n)));
+            console.warn(n,currentShape.get(propertyName(n)));
           }
         });
       };
 
+      // It makes more sense in the UI
+      // to have the fill setting map to stroke, and stroke to fill for text
+      var propertyMappings = {
+        text: {
+          stroke: 'fill',
+          fill:   'stroke'
+        }
+      };
+
+      var propertyName = function(property){
+        if( currentShape &&
+            propertyMappings[currentShape.type] &&
+            propertyMappings[currentShape.type][property] ){
+          return propertyMappings[currentShape.type][property];
+        } else {
+          return property;
+        }
+      };
+
       var updateShape = function(property,value){
         if(currentShape){
-          currentShape.set(property,value);
+          currentShape.set(propertyName(property),value);
           that.fabricCanvas.renderAll();
         }
       };
