@@ -199,6 +199,25 @@ DrawingFabric.Functionality.tools = (function(){
         }
       };
 
+      this.toolProperties = function(){
+        switch(tool){
+        case 'triangle':
+        case 'rectangle':
+        case 'ellipse':
+        case 'line':
+        case 'draw':
+        case 'arc':
+          return ['fill','stroke','strokeWidth','strokeDashArray'];
+        case 'text':
+          return ['fill','stroke','strokeWidth','strokeDashArray',
+                  'fontFamily', 'fontSize','fontWeight','lineHeight',
+                  'textBackgroundColor', 'textDecoration', 'textShadow'
+                 ];
+        default:
+          return [];
+        }
+      };
+
       this.tool('cursor');
     };
 
@@ -862,6 +881,7 @@ DrawingFabric.Functionality.addText = (function(){
             // TODO: Makes more sense to map to fill to stroke
             // Need to think of higher level mechanism to represent this
             stroke:      that.properties.fill(),
+            strokeWidth: that.properties.strokeWidth(),
             active:      true,
             dblselected: true
           });
@@ -980,6 +1000,19 @@ DrawingFabric.Functionality.selectedProperties = (function(){
         });
       };
 
+      var updateDOMTool = function(event){
+        var supportedToolProperties = that.toolProperties();
+
+        eachConfig(function(n,conf){
+          if(supportedToolProperties.indexOf(n) >= 0){
+            showDomElement(conf.parent);
+          } else {
+            hideDomElement(conf.parent);
+          }
+        });
+      };
+      updateDOMTool();
+
       // It makes more sense in the UI
       // to have the fill setting map to stroke, and stroke to fill for text
       var propertyMappings = {
@@ -1010,6 +1043,8 @@ DrawingFabric.Functionality.selectedProperties = (function(){
       this.fabricCanvas.on('object:modified', updateDOM);
       this.fabricCanvas.on('object:scaling',  updateDOM);
       this.fabricCanvas.on('object:moving',   updateDOM);
+
+      this.fabricCanvas.on('tool:change', updateDOMTool);
 
       this.fabricCanvas.on('selection:cleared', function(event){
         currentShape = null;

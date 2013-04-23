@@ -59,10 +59,9 @@ TODO
 This project is very much in it's infancy, here is what is top of the list:
 
  - Switch to Sprockets to split up Javascript
- - Tools for controlling object properties like fill, stroke, font etc.
+ - Refactor tools for controlling object properties like fill, stroke, font etc, the code here can be simplified.
  - Adjust how focus works so that items are not accidentally drawn when
    selecting, or selected when drawing.
- - Skin UI of demo
  - Look into ways of testing the blocks.
  - Some kind of 'traits' system so that interdependencies of Functionality can
    be described
