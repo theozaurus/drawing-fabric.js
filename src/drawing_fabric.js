@@ -891,9 +891,17 @@ DrawingFabric.Functionality.selectedProperties = (function(){
       var eachConfig = function(fun){
         for(var n in config){
           if(config.hasOwnProperty(n) && that.properties.hasOwnProperty(n)){
-            fun(n);
+            fun(n,config[n]);
           }
         }
+      };
+
+      var showDomElement = function($element){
+        if($element){ $element.show(); }
+      };
+
+      var hideDomElement = function($element){
+        if($element){ $element.hide(); }
       };
 
       var setDomElementValue = function($element,value){
@@ -930,8 +938,8 @@ DrawingFabric.Functionality.selectedProperties = (function(){
       };
 
       var bindDomElements = function(){
-        eachConfig(function(n){
-          var $e = config[n];
+        eachConfig(function(n,conf){
+          var $e = conf.value;
           var defaultValue = that.properties[n]();
           $e.change(domInputChangeFactory(n));
           setDomElementValue( $e, defaultValue );
@@ -962,10 +970,12 @@ DrawingFabric.Functionality.selectedProperties = (function(){
         if(currentShape != shape){ supported = supportedProperties(shape); }
         currentShape = shape;
 
-        eachConfig(function(n){
+        eachConfig(function(n,conf){
           if(supported.indexOf(n) >= 0){
-            setDomElementValue(config[n],currentShape.get(propertyName(n)));
-            console.warn(n,currentShape.get(propertyName(n)));
+            showDomElement(conf.parent);
+            setDomElementValue(conf.value,currentShape.get(propertyName(n)));
+          } else {
+            hideDomElement(conf.parent);
           }
         });
       };

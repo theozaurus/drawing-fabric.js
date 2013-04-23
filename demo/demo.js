@@ -1,4 +1,5 @@
 $(function(){
+
   c = new DrawingFabric.Canvas('canvas');
 
   c.addFunctionality(new DrawingFabric.Functionality.keyboardEvents()); // Required by keybaordCommands
@@ -25,14 +26,38 @@ $(function(){
   c.addFunctionality(new DrawingFabric.Functionality.drawShapeWithMouse());
   c.addFunctionality(new DrawingFabric.Functionality.drawLineWithMouse());
   c.addFunctionality(new DrawingFabric.Functionality.selectedProperties({
-    strokeWidth: $('.js-selected-properties-stroke-width'),
-    stroke:      $('.js-selected-properties-stroke'),
-    fill:        $('.js-selected-properties-fill'),
-    fontFamily:  $('.js-selected-properties-font-family'),
-    fontSize:    $('.js-selected-properties-font-size'),
-    lineHeight:  $('.js-selected-properties-line-height'),
-    fontStyle:   $('.js-selected-properties-font-style'),
-    fontWeight:  $('.js-selected-properties-font-weight')
+    strokeWidth: {
+      value:  $('.js-selected-properties-stroke-width-value'),
+      parent: $('.js-selected-properties-stroke-width')
+    },
+    stroke: {
+      value:  $('.js-selected-properties-stroke-value'),
+      parent: $('.js-selected-properties-stroke')
+    },
+    fill: {
+      value: $ ('.js-selected-properties-fill-value'),
+      parent: $('.js-selected-properties-fill')
+    },
+    fontFamily: {
+      value:  $('.js-selected-properties-font-family-value'),
+      parent: $('.js-selected-properties-font-family')
+    },
+    fontSize: {
+      value:  $('.js-selected-properties-font-size-value'),
+      parent: $('.js-selected-properties-font-size')
+    },
+    lineHeight: {
+      value:  $('.js-selected-properties-line-height-value'),
+      parent: $('.js-selected-properties-line-height')
+    },
+    fontStyle: {
+      value:  $('.js-selected-properties-font-style-value'),
+      parent: $('.js-selected-properties-font-style')
+    },
+    fontWeight: {
+      value:  $('.js-selected-properties-font-weight-value'),
+      parent: $('.js-selected-properties-font-weight')
+    }
   }));
 
   // Customise buttons
