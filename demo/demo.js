@@ -27,12 +27,48 @@ $(function(){
   c.addFunctionality(new DrawingFabric.Functionality.selectedProperties({
     strokeWidth: $('.js-selected-properties-stroke-width'),
     stroke:      $('.js-selected-properties-stroke'),
-    fill:        $('.js-selected-properties-fill')
+    fill:        $('.js-selected-properties-fill'),
+    fontFamily:  $('.js-selected-properties-font-family'),
+    fontSize:    $('.js-selected-properties-font-size'),
+    lineHeight:  $('.js-selected-properties-line-height'),
+    fontStyle:   $('.js-selected-properties-font-style'),
+    fontWeight:  $('.js-selected-properties-font-weight')
   }));
 
+  // Customise buttons
+
+  //// Use spectrum colour picker
   $('.js-color').spectrum({
     showAlpha:       true,
     preferredFormat: 'rgb'
+  });
+
+  //// Turn checkboxes into toggle buttons
+  $('.js-bootstrap-toggle').each(function(i,e){
+    var $e = $(e);
+
+    var $input = $e.find('input');
+
+    // Find input and hide it
+    $input.hide();
+
+    // Wrap with boot strap toggle button
+    $e.wrap('<button type="button" class="btn" data-toggle="button"></button>');
+
+    // Make button strap toggle button match value of checkbox
+    var $button = $e.parents('button');
+    if($input.is(':checked')){ $button.button('toggle'); }
+
+    $input.change(function(){
+      if( $input.is(':checked') != $button.hasClass('active')){
+        $button.button('toggle');
+      }
+    });
+
+    $button.click(function(){
+      $input.prop('checked',$button.hasClass('active'));
+    });
+
   });
 
 

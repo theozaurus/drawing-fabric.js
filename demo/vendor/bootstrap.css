@@ -2315,6 +2315,8 @@ table th[class*="span"],
 .icon-text-resize { background-position: -73px -39px; }
 .icon-hand-up { background-position: -5px -75px; }
 .icon-vector_path_triangle { background-position: -39px -75px; }
+.icon-italic { background-position: -74px -75px; }
+.icon-bold { background-position: -109px -75px; }
 
 .dropup,
 .dropdown {

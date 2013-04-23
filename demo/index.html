@@ -11,6 +11,7 @@
     <!-- External script dependencies  -->
     <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js'></script>
     <script type='text/javascript' src='../vendor/fabric.js'></script>
+    <script type='text/javascript' src='./vendor/bootstrap.js'></script>
     <script type='text/javascript' src='./vendor/spectrum.js'></script>
 
     <!-- The library -->
@@ -73,6 +74,50 @@
               <dt>Stroke</dt>
               <dd>
                 <input type='text' class='js-selected-properties-stroke span1 js-color'></input>
+              </dd>
+
+              <dt>Font Family</dt>
+              <dd>
+                <select type="text" class="js-selected-properties-font-family span2">
+                  <option value='sans-serif'>Sans Serif</option>
+                  <option value='serif'>Serif</option>
+                  <option value='cursive'>Cursive</option>
+                  <option value='fantasy'>Fantasy</option>
+                  <option value='monospace'>Monospace</option>
+                </select>
+              </dd>
+
+              <dt>Font Size</dt>
+              <dd>
+                <select type="text" class="js-selected-properties-font-size span1">
+                  <option value='24'>24</option>
+                  <option value='36'>36</option>
+                  <option value='48'>48</option>
+                  <option value='64'>64</option>
+                  <option value='72'>72</option>
+                </select>
+              </dd>
+
+              <dt>Line height</dt>
+              <dd>
+                <select type="text" class="js-selected-properties-line-height span1">
+                  <option value='0.8'>0.8</option>
+                  <option value='0.9'>0.9</option>
+                  <option value='1'>1</option>
+                  <option value='1.1'>1.1</option>
+                  <option value='1.2'>1.2</option>
+                  <option value='1.3'>1.3</option>
+                </select>
+              </dd>
+
+              <dt>Italic</dt>
+              <dd>
+                <label class="js-bootstrap-toggle"><input class="btn js-selected-properties-font-style" type="checkbox" value="italic"/><i class='icon-italic'></i></label>
+              </dd>
+
+              <dt>Bold</dt>
+              <dd>
+                <label class="js-bootstrap-toggle"><input class="btn js-selected-properties-font-weight" type="checkbox" value="bold"/><i class='icon-bold'></i></label>
               </dd>
 
             </ul>

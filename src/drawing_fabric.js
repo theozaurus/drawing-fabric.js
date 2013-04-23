@@ -855,6 +855,10 @@ DrawingFabric.Functionality.addText = (function(){
             top:         coords.y,
             originY:     'top',
             originX:     'left',
+            fontFamily:  that.properties.fontFamily(),
+            fontSize:    that.properties.fontSize(),
+            fontStyle:   that.properties.fontStyle(),
+            lineHeight:  that.properties.lineHeight(),
             active:      true,
             dblselected: true
           });
@@ -889,12 +893,32 @@ DrawingFabric.Functionality.selectedProperties = (function(){
         }
       };
 
+      var setDomElementValue = function($element,value){
+        if($element.is('[type="checkbox"]')){
+          $element.prop("checked",value == $element.val()).trigger('change');
+        } else {
+          $element.val((value||'').toString());
+        }
+      };
+
+      var getDomElementValue = function($element){
+        if($element.is('[type="checkbox"]')){
+          if($element.prop("checked")){
+            return $element.val();
+          } else {
+            return 'normal';
+          }
+        } else {
+          return $element.val();
+        }
+      };
+
       var domInputChangeFactory = function(property){
         return function(event){
-          var value = $(event.target).val();
+          var value = getDomElementValue($(event.target));
           var parsedValue = that.properties[property](value);
-          if(supported && supported.indexOf(property) >= 0){
-            lastShape.set(property,value);
+          if(currentShape && supported && supported.indexOf(property) >= 0){
+            currentShape.set(property,parsedValue);
             that.fabricCanvas.renderAll();
           }
         };
@@ -905,7 +929,7 @@ DrawingFabric.Functionality.selectedProperties = (function(){
           var $e = config[n];
           var defaultValue = that.properties[n]();
           $e.change(domInputChangeFactory(n));
-          $e.val( defaultValue );
+          setDomElementValue( $e, defaultValue );
         });
       };
 
@@ -925,23 +949,24 @@ DrawingFabric.Functionality.selectedProperties = (function(){
 
       bindDomElements();
 
-      var lastShape;
+      var currentShape;
       var supported;
       var updateDOM = function(event){
         var shape = event.target;
 
-        if(lastShape != shape){ supported = supportedProperties(shape); }
+        if(currentShape != shape){ supported = supportedProperties(shape); }
+        currentShape = shape;
 
         eachConfig(function(n){
-          config[n].val(shape.get(n));
+          if(supported.indexOf(n) >= 0){
+            setDomElementValue(config[n],shape.get(n));
+          }
         });
-
-        lastShape = shape;
       };
 
       var updateShape = function(property,value){
-        if(lastShape){
-          lastShape.set(property,value);
+        if(currentShape){
+          currentShape.set(property,value);
           that.fabricCanvas.renderAll();
         }
       };
@@ -952,8 +977,8 @@ DrawingFabric.Functionality.selectedProperties = (function(){
       this.fabricCanvas.on('object:moving',   updateDOM);
 
       this.fabricCanvas.on('selection:cleared', function(event){
-        lastShape = null;
-        supported = null;
+        currentShape = null;
+        supported    = null;
       });
 
     };
@@ -982,9 +1007,10 @@ DrawingFabric.Canvas = (function(){
       'strokeWidth':         new Property({initial: 2, parser: function(v){ return parseInt(v,10); }}),
       'strokeDashArray':     new Property({initial: null}),
       'fontFamily':          new Property({initial: 'sans-serif'}), // serif, monospace, cursive, fantasy
+      'fontSize':            new Property({initial: 36, parser: function(v){ return parseInt(v,10); }}),
       'fontStyle':           new Property({initial: 'normal'}),     // italic, oblique
       'fontWeight':          new Property({initial: 'normal'}),     // bold, bolder, lighter
-      'lineHeight':          new Property({initial: 1.3, parser: function(v){ return parseFloat(v); }}),
+      'lineHeight':          new Property({initial: 1.0, parser: function(v){ return parseFloat(v); }}),
       'textBackgroundColor': new Property({initial: 'none'}),
       'textDecoration':      new Property({initial: 'none'}),       // underline, overline, line-through
       'textShadow':          new Property({initial: ''})
