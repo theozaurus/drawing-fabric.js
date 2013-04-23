@@ -895,10 +895,11 @@ DrawingFabric.Functionality.selectedProperties = (function(){
 
       var setDomElementValue = function($element,value){
         if($element.is('[type="checkbox"]')){
-          $element.prop("checked",value == $element.val()).trigger('change');
+          $element.prop("checked",value == $element.val());
         } else {
           $element.val((value||'').toString());
         }
+        $element.trigger('change');
       };
 
       var getDomElementValue = function($element){

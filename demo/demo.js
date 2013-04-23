@@ -38,9 +38,22 @@ $(function(){
   // Customise buttons
 
   //// Use spectrum colour picker
-  $('.js-color').spectrum({
-    showAlpha:       true,
-    preferredFormat: 'rgb'
+  $('.js-color').each(function(i,e){
+    var $e = $(e);
+
+    // Enable spectrum on each input
+    $e.spectrum({
+      showAlpha:       true,
+      preferredFormat: 'rgb'
+    });
+
+    // Ensure if the input changes spectrum is updated
+    $e.change(function(){
+      var newVal = $e.val();
+      if($e.spectrum('get') != newVal){
+        $e.spectrum('set',newVal);
+      }
+    });
   });
 
   //// Turn checkboxes into toggle buttons
