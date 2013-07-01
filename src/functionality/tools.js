@@ -51,10 +51,10 @@ DrawingFabric.Functionality.tools = (function(){
         case 'line':
         case 'draw':
         case 'arc':
-          return ['fill','stroke','strokeWidth','strokeDashArray'];
+          return ['fill', 'stroke', 'strokeWidth', 'strokeDashArray'];
         case 'text':
-          return ['fill','stroke','strokeWidth','strokeDashArray',
-                  'fontFamily', 'fontSize','fontWeight','lineHeight',
+          return ['fill', 'stroke', 'strokeWidth', 'strokeDashArray',
+                  'fontFamily', 'fontStyle', 'fontSize', 'fontWeight', 'lineHeight',
                   'textBackgroundColor', 'textDecoration', 'textShadow'
                  ];
         default:
