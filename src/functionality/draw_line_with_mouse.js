@@ -26,7 +26,8 @@ DrawingFabric.Functionality.drawLineWithMouse = (function(){
           path = new fabric.Path('M' + startCoords.x + ',' + startCoords.y+'L'+coords.x+','+coords.y);
           path.set({
             stroke:      that.properties.stroke(),
-            strokeWidth: that.properties.strokeWidth()
+            strokeWidth: that.properties.strokeWidth(),
+            fill:        'none'
           });
 
           that.fabricCanvas.add(path);
