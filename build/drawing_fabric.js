@@ -576,7 +576,7 @@ DrawingFabric.Functionality.drawArcWithMouse = (function(){
         if(isArc()){
           switch(stage){
           case 'center':
-            if(!event.target){center(event);}
+            center(event);
             break;
           case 'firstPoint':
             firstPoint(event);
@@ -692,7 +692,7 @@ DrawingFabric.Functionality.drawShapeWithMouse = (function(){
       };
 
       this.fabricCanvas.on('mouse:down', function(event){
-        if(isObject() && !event.target ){
+        if(isObject()){
           mouseStartCoord = utils.mouseCoord(event);
           mouseState      = 'down';
 
@@ -915,6 +915,36 @@ DrawingFabric.Functionality.mouseInfo = (function(){
       this.fabricCanvas.on("mouse:move",function(event){
         config.x.html(event.e.layerX);
         config.y.html(event.e.layerY);
+      });
+
+    };
+
+  };
+
+}());
+
+
+
+DrawingFabric.Functionality.selectWithCursor = (function(){
+
+  var utils = DrawingFabric.utils;
+
+  return function(){
+
+    this.initialize = function(){
+
+      var that = this;
+
+      var findTargetOrig = this.fabricCanvas.findTarget;
+
+      this.fabricCanvas.on('tool:change',function(t){
+        if(t == 'cursor'){
+          that.fabricCanvas.selection = true;
+          that.fabricCanvas.findTarget = findTargetOrig;
+        } else {
+          that.fabricCanvas.selection = false;
+          that.fabricCanvas.findTarget = function(){};
+        }
       });
 
     };

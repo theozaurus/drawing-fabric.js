@@ -44,7 +44,7 @@ DrawingFabric.Functionality.drawShapeWithMouse = (function(){
       };
 
       this.fabricCanvas.on('mouse:down', function(event){
-        if(isObject() && !event.target ){
+        if(isObject()){
           mouseStartCoord = utils.mouseCoord(event);
           mouseState      = 'down';
 

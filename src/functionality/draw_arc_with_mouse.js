@@ -143,7 +143,7 @@ DrawingFabric.Functionality.drawArcWithMouse = (function(){
         if(isArc()){
           switch(stage){
           case 'center':
-            if(!event.target){center(event);}
+            center(event);
             break;
           case 'firstPoint':
             firstPoint(event);

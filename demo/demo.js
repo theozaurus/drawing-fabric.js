@@ -15,6 +15,7 @@ $(function(){
     arc:       $('.js-tools-arc'),
     text:      $('.js-tools-text')
   }));
+  c.addFunctionality(new DrawingFabric.Functionality.selectWithCursor());
   c.addFunctionality(new DrawingFabric.Functionality.mouseInfo({
     x:    $('.js-mouse-info-x'),
     y:    $('.js-mouse-info-y')

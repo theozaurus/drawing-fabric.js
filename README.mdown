@@ -52,6 +52,7 @@ Here's a list of what functionality has been created so far:
   - __drawArcWithMouse__ - Can draw an arc on the page using the mouse to set centre, radius and sweep
   - __drawLineWithMouse__ - Allows straight lines to be drawn on the page
   - __selectedProperties__ - Shows what properties the selected object has (stroke, colour, ...)
+  - __selectWithCursor__ - Ensures that objects are only selected when the cursor tool is being used
   - __canvasResizer__ - Resizes the drawing area based on the dimensions of a wrapping element
 
 Building
