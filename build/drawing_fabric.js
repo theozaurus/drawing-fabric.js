@@ -435,6 +435,60 @@ DrawingFabric.Functionality.addText = (function(){
 
 
 
+DrawingFabric.Functionality.canvasResizer = (function(){
+
+  return function(container){
+
+    this.initialize = function(){
+
+      var that = this;
+
+      var getDimensions = function(){
+        return {width: container.width(), height: container.height()};
+      };
+
+      var isVisible = function(){
+        return container.is(":visible");
+      };
+
+      var last;
+      var correctSize = function(){
+        if(isVisible()){
+          var dimensions = getDimensions();
+          if(last != dimensions){
+            that.fabricCanvas.setDimensions(dimensions);
+            last = dimensions;
+          }
+        } else {
+          queueCheck();
+        }
+      };
+
+      var timer = null;
+      var queueCheck = function(){
+        clearTimeout(timer);
+        timer = setTimeout(correctSize, 1000);
+      };
+
+      var validContainer = function(){
+        return container &&
+               typeof container.width == 'function' &&
+               typeof container.height == 'function';
+      };
+
+      if(validContainer()){
+        $(window).resize(correctSize);
+        correctSize();
+      }
+    };
+
+  };
+
+}());
+
+
+
+
 DrawingFabric.Functionality.drawArcWithMouse = (function(){
 
   var utils = DrawingFabric.utils;
@@ -621,7 +675,8 @@ DrawingFabric.Functionality.drawLineWithMouse = (function(){
           path = new fabric.Path('M' + startCoords.x + ',' + startCoords.y+'L'+coords.x+','+coords.y);
           path.set({
             stroke:      that.properties.stroke(),
-            strokeWidth: that.properties.strokeWidth()
+            strokeWidth: that.properties.strokeWidth(),
+            fill:        'none'
           });
 
           that.fabricCanvas.add(path);
@@ -1163,10 +1218,10 @@ DrawingFabric.Functionality.tools = (function(){
         case 'line':
         case 'draw':
         case 'arc':
-          return ['fill','stroke','strokeWidth','strokeDashArray'];
+          return ['fill', 'stroke', 'strokeWidth', 'strokeDashArray'];
         case 'text':
-          return ['fill','stroke','strokeWidth','strokeDashArray',
-                  'fontFamily', 'fontSize','fontWeight','lineHeight',
+          return ['fill', 'stroke', 'strokeWidth', 'strokeDashArray',
+                  'fontFamily', 'fontStyle', 'fontSize', 'fontWeight', 'lineHeight',
                   'textBackgroundColor', 'textDecoration', 'textShadow'
                  ];
         default:
