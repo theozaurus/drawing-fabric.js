@@ -49,9 +49,10 @@ DrawingFabric.Functionality.tools = (function(){
         case 'rectangle':
         case 'ellipse':
         case 'line':
-        case 'draw':
         case 'arc':
           return ['fill', 'stroke', 'strokeWidth', 'strokeDashArray'];
+        case 'draw':
+          return ['stroke', 'strokeWidth', 'strokeDashArray'];
         case 'text':
           return ['fill', 'stroke', 'strokeWidth', 'strokeDashArray',
                   'fontFamily', 'fontStyle', 'fontSize', 'fontWeight', 'lineHeight',
