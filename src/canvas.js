@@ -10,6 +10,8 @@ DrawingFabric.Canvas = (function(){
   })();
 
   buildProperties = function(){
+    var that = this;
+
     var properties = {};
 
     var toolProperties = {
@@ -27,11 +29,12 @@ DrawingFabric.Canvas = (function(){
       'textShadow':          new Property({initial: ''})
     };
 
-    var propertySetterFactory = function(property){
+    var propertySetterFactory = function(name,property){
       var stored = property.initial;
       return function(v){
         if(typeof v != 'undefined'){
           stored = property.parser(v);
+          that.fabricCanvas.fire("property:change",name);
         }
         return stored;
       };
@@ -40,7 +43,7 @@ DrawingFabric.Canvas = (function(){
     for(var name in toolProperties){
       if(toolProperties.hasOwnProperty(name)){
         var property = toolProperties[name];
-        properties[name] = propertySetterFactory(property);
+        properties[name] = propertySetterFactory(name,property);
       }
     }
 
@@ -51,7 +54,7 @@ DrawingFabric.Canvas = (function(){
 
     var that = this;
 
-    this.properties = buildProperties();
+    this.properties = buildProperties.apply(this);
 
     this.fabricCanvas = new fabric.Canvas(canvas_id);
 

@@ -13,16 +13,26 @@ DrawingFabric.Functionality.drawWithMouse = (function(){
 
       var drawing = false;
 
+      var setProperties = function(){
+        console.warn('setProperties');
+        that.fabricCanvas.freeDrawingBrush.color = that.properties.stroke();
+        that.fabricCanvas.freeDrawingBrush.width = that.properties.strokeWidth();
+      };
+
       this.fabricCanvas.on('tool:change',function(t){
         if(t == 'draw'){
           drawing = true;
           that.fabricCanvas.isDrawingMode = true;
-          that.fabricCanvas.freeDrawingColor     = that.properties.stroke();
-          that.fabricCanvas.freeDrawingLineWidth = that.properties.strokeWidth();
-
+          setProperties();
         } else if (drawing){
           drawing = false;
           that.fabricCanvas.isDrawingMode = false;
+        }
+      });
+
+      this.fabricCanvas.on('property:change', function(name){
+        if(drawing && (name == 'stroke' || name == 'strokeWidth')){
+          setProperties();
         }
       });
 

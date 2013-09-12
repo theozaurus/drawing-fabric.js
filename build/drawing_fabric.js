@@ -15,6 +15,8 @@ DrawingFabric.Canvas = (function(){
   })();
 
   buildProperties = function(){
+    var that = this;
+
     var properties = {};
 
     var toolProperties = {
@@ -32,11 +34,12 @@ DrawingFabric.Canvas = (function(){
       'textShadow':          new Property({initial: ''})
     };
 
-    var propertySetterFactory = function(property){
+    var propertySetterFactory = function(name,property){
       var stored = property.initial;
       return function(v){
         if(typeof v != 'undefined'){
           stored = property.parser(v);
+          that.fabricCanvas.fire("property:change",name);
         }
         return stored;
       };
@@ -45,7 +48,7 @@ DrawingFabric.Canvas = (function(){
     for(var name in toolProperties){
       if(toolProperties.hasOwnProperty(name)){
         var property = toolProperties[name];
-        properties[name] = propertySetterFactory(property);
+        properties[name] = propertySetterFactory(name,property);
       }
     }
 
@@ -56,7 +59,7 @@ DrawingFabric.Canvas = (function(){
 
     var that = this;
 
-    this.properties = buildProperties();
+    this.properties = buildProperties.apply(this);
 
     this.fabricCanvas = new fabric.Canvas(canvas_id);
 
@@ -829,16 +832,26 @@ DrawingFabric.Functionality.drawWithMouse = (function(){
 
       var drawing = false;
 
+      var setProperties = function(){
+        console.warn('setProperties');
+        that.fabricCanvas.freeDrawingBrush.color = that.properties.stroke();
+        that.fabricCanvas.freeDrawingBrush.width = that.properties.strokeWidth();
+      };
+
       this.fabricCanvas.on('tool:change',function(t){
         if(t == 'draw'){
           drawing = true;
           that.fabricCanvas.isDrawingMode = true;
-          that.fabricCanvas.freeDrawingColor     = that.properties.stroke();
-          that.fabricCanvas.freeDrawingLineWidth = that.properties.strokeWidth();
-
+          setProperties();
         } else if (drawing){
           drawing = false;
           that.fabricCanvas.isDrawingMode = false;
+        }
+      });
+
+      this.fabricCanvas.on('property:change', function(name){
+        if(drawing && (name == 'stroke' || name == 'strokeWidth')){
+          setProperties();
         }
       });
 
