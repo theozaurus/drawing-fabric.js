@@ -833,7 +833,6 @@ DrawingFabric.Functionality.drawWithMouse = (function(){
       var drawing = false;
 
       var setProperties = function(){
-        console.warn('setProperties');
         that.fabricCanvas.freeDrawingBrush.color = that.properties.stroke();
         that.fabricCanvas.freeDrawingBrush.width = that.properties.strokeWidth();
       };
